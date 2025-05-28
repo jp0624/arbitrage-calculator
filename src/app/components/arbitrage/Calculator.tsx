@@ -13,6 +13,7 @@ import HockeyTeams from "@/data/teams/hockey.json"; // Restore hockey teams impo
 import SelectionBar from "./SelectionsBar";
 import SportsbookTable from "./SportsBookTable";
 import ArbitrageResults from "./ArbitrageResults";
+import FindBestArbitrage from "./findBestArbitrage";
 
 function Calculator() {
   type SportsBook = {
@@ -147,6 +148,7 @@ function Calculator() {
       <h1 className="text-3xl font-bold m-5">
         {sport?.name} Arbitrage Calculator
       </h1>
+      <FindBestArbitrage />
       <SelectionBar
         sports={sports}
         sport={sport}

@@ -1,4 +1,3 @@
-// components/ArbitrageResults.tsx
 "use client";
 import React from "react";
 
@@ -20,7 +19,7 @@ interface Props {
     name: string;
     odds: { name: string; values: string[] }[];
   }[];
-  selectedTeams: string[];
+  selectedTeams: string[]; // exactly two for two-way market
   betTypes: { name: string }[];
   defaultBetAmount: number;
 }
@@ -42,14 +41,13 @@ function ArbitrageResults({
 
         sportsBooks.forEach((book) => {
           const oddsEntry = book.odds.find((o) => o.name === betType.name);
-          if (!oddsEntry) return;
+          if (!oddsEntry || oddsEntry.values.length < 2) return;
 
           oddsEntry.values.forEach((oddStr, teamIndex) => {
             const odds = parseFloat(oddStr);
             if (!isNaN(odds) && odds !== 0) {
-              // Convert American odds to Decimal
-              const decimalOdds =
-                odds > 0 ? 1 + odds / 100 : 1 + 100 / Math.abs(odds);
+              const decimalOdds = odds;
+              // odds > 0 ? 1 + odds / 100 : 1 + 100 / Math.abs(odds);
               oddsData.push({
                 sportsbook: book.name,
                 team: selectedTeams[teamIndex],
@@ -59,43 +57,63 @@ function ArbitrageResults({
           });
         });
 
-        // Find best odds for each team
-        const bestOdds = selectedTeams.map(
-          (team) =>
-            oddsData
-              .filter((o) => o.team === team)
-              .sort((a, b) => b.odds - a.odds)[0]
-        );
+        if (selectedTeams.length !== 2) return null;
 
-        if (bestOdds.some((o) => !o)) return null;
+        let bestCombo: ArbitrageOpportunity | null = null;
+        let lowestImpliedProb = Infinity;
 
-        const inverseSum = bestOdds.reduce(
-          (acc, odd) => acc + 1 / (odd?.odds || 1),
-          0
-        );
+        // Try all combinations where each team is from a different sportsbook
+        for (const team1Odds of oddsData.filter(
+          (o) => o.team === selectedTeams[0]
+        )) {
+          for (const team2Odds of oddsData.filter(
+            (o) => o.team === selectedTeams[1]
+          )) {
+            if (team1Odds.sportsbook === team2Odds.sportsbook) continue;
 
-        if (inverseSum >= 1) return null;
+            const implied = 1 / team1Odds.odds + 1 / team2Odds.odds;
 
-        const totalStake = defaultBetAmount;
-        const opportunities = bestOdds.map((odd) => {
-          const stake = (totalStake * (1 / odd.odds)) / inverseSum;
-          return {
-            ...odd,
-            stake: parseFloat(stake.toFixed(2)),
-            payout: parseFloat((stake * odd.odds).toFixed(2)),
-          };
-        });
+            if (implied < 1 && implied < lowestImpliedProb) {
+              const stake1 =
+                (defaultBetAmount * (1 / team1Odds.odds)) / implied;
+              const stake2 =
+                (defaultBetAmount * (1 / team2Odds.odds)) / implied;
+              const totalStake = stake1 + stake2;
+              const payout = stake1 * team1Odds.odds;
+              const guaranteedProfit = payout - totalStake;
 
-        const guaranteedProfit = parseFloat(
-          (opportunities[0].payout - totalStake).toFixed(2)
-        );
+              if (
+                guaranteedProfit > 0 &&
+                isFinite(stake1) &&
+                isFinite(stake2) &&
+                stake1 >= 0 &&
+                stake2 >= 0
+              ) {
+                lowestImpliedProb = implied;
 
-        return {
-          betType: betType.name,
-          opportunities,
-          totalStake,
-          guaranteedProfit,
-        };
+                bestCombo = {
+                  betType: betType.name,
+                  opportunities: [
+                    {
+                      ...team1Odds,
+                      stake: parseFloat(stake1.toFixed(2)),
+                      payout: parseFloat((stake1 * team1Odds.odds).toFixed(2)),
+                    },
+                    {
+                      ...team2Odds,
+                      stake: parseFloat(stake2.toFixed(2)),
+                      payout: parseFloat((stake2 * team2Odds.odds).toFixed(2)),
+                    },
+                  ],
+                  totalStake: parseFloat(totalStake.toFixed(2)),
+                  guaranteedProfit: parseFloat(guaranteedProfit.toFixed(2)),
+                };
+              }
+            }
+          }
+        }
+
+        return bestCombo;
       })
       .filter(Boolean) as ArbitrageOpportunity[];
   };

@@ -51,8 +51,11 @@ const SelectionBar: React.FC<SelectionBarProps> = ({
   };
   return (
     <ul className="items-center justify-center flex flex-row w-full gap-5 p-5">
-      <li className="grow items-center justify-center">
-        <Select onValueChange={handleSportChange}>
+      <li className="flex flex-row items-center grow justify-center">
+        <Select
+          onValueChange={handleSportChange}
+          value={sport?.name || "Hockey"} // Set default value to Hockey if sport is undefined
+        >
           <SelectTrigger className="w-[180px]">
             <SelectValue placeholder="Select Sport" />
           </SelectTrigger>
@@ -84,7 +87,7 @@ const SelectionBar: React.FC<SelectionBarProps> = ({
                     key={`${i}-${index}-${team.city ?? ""}-${team.name}`}
                     value={team.name}
                   >
-                    {team.name}
+                    {team.name || "Team"}
                   </SelectItem>
                 ))}
             </SelectContent>

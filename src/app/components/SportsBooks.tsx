@@ -1,13 +1,5 @@
 "use client";
 import React, { useState } from "react";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Input } from "@/components/ui/input";
 import { Button } from "./ui/button";
 import HockeyTeams from "@/data/teams/hockey.json";
 import SportsBooks from "@/data/sportsBooks.json";

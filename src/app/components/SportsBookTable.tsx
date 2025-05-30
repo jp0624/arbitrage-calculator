@@ -2,7 +2,6 @@ import Image from "next/image";
 import React from "react";
 import { Input } from "@/components//ui/input";
 import {
-  moneylineToProbability,
   decimalToAmericanOdds,
   americanToDecimalOdds,
 } from "@/lib/oddsConverter";

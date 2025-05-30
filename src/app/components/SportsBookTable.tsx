@@ -129,9 +129,7 @@ const SportsbookTable: React.FC<Props> = ({
                           let decimalOdds = 0;
 
                           try {
-                            decimalOdds = americanToDecimalOdds(
-                              parseFloat(americanInput)
-                            );
+                            decimalOdds = americanToDecimalOdds(americanInput);
                           } catch {
                             decimalOdds = 0;
                           }

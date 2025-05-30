@@ -1,7 +1,7 @@
 import React from "react";
 
 function footer() {
-  return <div></div>;
+  return <div className="flex h-15"></div>;
 }
 
 export default footer;

@@ -32,16 +32,16 @@ const SportsbookTable: React.FC<Props> = ({
 }) => {
   return (
     <div className="flex flex-row bg-slate-100 items-center border shadow-slate-300 shadow-md border-slate-300 justify-center w-[90%] mx-25 my-2.5 px-5 rounded-lg gap-5">
-      <div className="h-25 bg-slate-200 w-[20%] flex flex-col mx-auto my-5 justify-center items-center">
+      <div className="h-25  w-[20%] flex flex-col mx-auto my-5 justify-center items-center">
         {sportsBook.logo ? (
           <Image
+            className="w-36 h-36 mt-2"
             src={
               sportsBook.logo.startsWith("http")
                 ? sportsBook.logo
                 : `${sportsBook.logo}`
             }
             alt={sportsBook.name}
-            className="w-16 h-16 mt-2"
             width={64}
             height={64}
           />
@@ -99,8 +99,9 @@ const SportsbookTable: React.FC<Props> = ({
                 return (
                   <td
                     key={odd.name + teamIndex}
-                    className="text-center w-[20%]"
+                    className="text-center py-1 px-2.5 w-[20%]"
                   >
+                    {" "}
                     <div className="flex flex-row items-center justify-center">
                       {odd.type === "overunder" && (
                         <span
@@ -112,7 +113,7 @@ const SportsbookTable: React.FC<Props> = ({
                               value?.label === "Over" ? "Under" : "Over"
                             )
                           }
-                          className={`cursor-pointer text-sm w-10 h-5 block ml-2 rounded-sm text-center text-white ${
+                          className={`cursor-pointer text-sm mr-2 w-10 h-5 block ml-2 rounded-sm text-center text-white ${
                             value?.label === "Over"
                               ? "bg-slate-600"
                               : "bg-red-600"
@@ -134,7 +135,7 @@ const SportsbookTable: React.FC<Props> = ({
                           )
                         }
                       />
-                      <div className="text-[.65rem] px-2 font-bold bg-slate-300 justify-center items-center mr-1 w-12 rounded-sm p-0.5 border-l-2 ml-0.5 flex text-slate-600">
+                      <div className="text-[.65rem] px-2 ml-2 font-bold bg-slate-300 justify-center items-center mr-1 w-12 rounded-sm p-0.5 border-l-2 ml-0.5 flex text-slate-600">
                         {displayOdds}
                       </div>
                     </div>

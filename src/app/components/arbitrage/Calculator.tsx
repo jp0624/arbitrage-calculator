@@ -60,8 +60,8 @@ function Calculator() {
   const [defaultBetAmount, setDefaultBetAmount] = useState(100);
   const [sportsBooks, setSportsBooks] = useState<SportsBook[]>([
     {
-      name: "DraftKings",
-      logo: "/logos/logo-DraftKings.png",
+      name: "Sports Interaction",
+      logo: "/logos/logo-si.svg",
       odds: [
         {
           name: "Puck Line",
@@ -79,6 +79,54 @@ function Calculator() {
         {
           name: "Moneyline",
           values: [{ total: "1.85" }, { total: "1.98" }],
+          type: "moneyline",
+        },
+      ],
+    },
+    {
+      name: "DraftKings",
+      logo: "/logos/logo-draftkings.svg",
+      odds: [
+        {
+          name: "Puck Line",
+          values: [{ total: "1.5" }, { total: "1.5" }],
+          type: "spread",
+        },
+        {
+          name: "Total",
+          values: [
+            { label: "Over", total: "2.25" },
+            { label: "Under", total: "2.25" },
+          ],
+          type: "overunder",
+        },
+        {
+          name: "Moneyline",
+          values: [{ total: "1.65" }, { total: "1.5" }],
+          type: "moneyline",
+        },
+      ],
+    },
+    {
+      name: "Pinnacle",
+      logo: "/logos/logo-pinnacle.svg",
+      odds: [
+        {
+          name: "Puck Line",
+          values: [{ total: "1.35" }, { total: "2.25" }],
+          type: "spread",
+        },
+        {
+          name: "Total",
+          values: [
+            { label: "Over", total: "5.5" },
+            { label: "Under", total: "5.5" },
+          ],
+          type: "overunder",
+        },
+        {
+          name: "Moneyline",
+          values: [{ total: "1.88" }, { total: "1.5" }],
           type: "moneyline",
         },
       ],
@@ -263,7 +311,7 @@ function Calculator() {
       <div className="flex flex-row items-center justify-center gap-2 mt-4">
         <Button
           onClick={() => setShowModal(true)}
-          className=" text-white px-4 py-2 rounded shadow hover:cursor-pointer"
+          className=" text-white px-4 py-2 rounded-md shadow hover:cursor-pointer"
         >
           Add Sportsbook
         </Button>
@@ -323,7 +371,7 @@ function Calculator() {
               </button>
               <button
                 onClick={handleAddSportsBook}
-                className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+                className="px-4 py-2 bg-slate-600 text-white rounded hover:bg-slate-700"
               >
                 Add
               </button>

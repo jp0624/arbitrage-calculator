@@ -168,7 +168,7 @@ MIT License. See `LICENSE` file for details.
 ## 👨‍💻 Author
 
 Developed by **John Parker**
-Senior Software Engineer & Team Lead – [LinkedIn](https://linkedin.com/in/john-parker)
+Senior Software Engineer & Team Lead – [LinkedIn](https://linkedin.com/in/jp0624)
 
 ---
 

@@ -59,7 +59,19 @@ function Calculator() {
   const [sport, setSport] = useState<(typeof sports)[0] | undefined>(sports[0]);
   const [selectedTeams, setSelectedTeams] = useState<string[]>(defaultTeams);
   const [defaultBetAmount, setDefaultBetAmount] = useState(100);
-  const [sportsBooks, setSportsBooks] = useState<SportsBook[]>(SportsBooks);
+  const [sportsBooks, setSportsBooks] = useState<SportsBook[]>(
+    (SportsBooks as any[]).map((book) => ({
+      ...book,
+      odds: book.odds.map((odds: any) => ({
+        ...odds,
+        values: odds.values.map((v: any) => ({
+          ...v,
+          label:
+            v.label === "Over" || v.label === "Under" ? v.label : undefined,
+        })),
+      })),
+    }))
+  );
 
   const [showModal, setShowModal] = useState(false);
   const [newBookName, setNewBookName] = useState("");

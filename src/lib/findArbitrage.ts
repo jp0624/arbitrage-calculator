@@ -1,5 +1,3 @@
-// utils/findArbitrage.ts
-
 export type OddsEntry = {
   sportsbook: string;
   odds: number;

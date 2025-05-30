@@ -1,0 +1,18 @@
+[
+  {
+    "name": "Hockey",
+    "teams": []
+  },
+  {
+    "name": "Football",
+    "teams": [{ "name": "Team A" }, { "name": "Team B" }]
+  },
+  {
+    "name": "Basketball",
+    "teams": [{ "name": "Team A" }, { "name": "Team B" }]
+  },
+  {
+    "name": "Baseball",
+    "teams": [{ "name": "Team A" }, { "name": "Team B" }]
+  }
+]

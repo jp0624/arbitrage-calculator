@@ -18,7 +18,7 @@
       },
       {
         "name": "Moneyline",
-        "values": [{ "total": "1.85" }, { "total": "1.98" }],
+        "values": [{ "total": "2.10" }, { "total": "1.80" }],
         "type": "moneyline"
       }
     ]
@@ -42,7 +42,7 @@
       },
       {
         "name": "Moneyline",
-        "values": [{ "total": "1.65" }, { "total": "1.5" }],
+        "values": [{ "total": "1.65" }, { "total": "2.30" }],
         "type": "moneyline"
       }
     ]
@@ -91,6 +91,30 @@
       {
         "name": "Moneyline",
         "values": [{ "total": "1.88" }, { "total": "1.94" }],
+        "type": "moneyline"
+      }
+    ]
+  },
+  {
+    "name": "BetMGM",
+    "logo": "/logos/logo-betmgm.svg",
+    "odds": [
+      {
+        "name": "Puck Line",
+        "values": [{ "total": "1.4" }, { "total": "2.6" }],
+        "type": "spread"
+      },
+      {
+        "name": "Total",
+        "values": [
+          { "label": "Over", "total": "1.85" },
+          { "label": "Under", "total": "1.95" }
+        ],
+        "type": "overunder"
+      },
+      {
+        "name": "Moneyline",
+        "values": [{ "total": "2.00" }, { "total": "1.80" }],
         "type": "moneyline"
       }
     ]

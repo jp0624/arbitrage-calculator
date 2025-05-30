@@ -4,7 +4,7 @@ import { Input } from "@/components//ui/input";
 import {
   moneylineToProbability,
   decimalToAmericanOdds,
-  decimalToMoneyline,
+  americanToDecimalOdds,
 } from "@/lib/oddsConverter";
 
 type Props = {
@@ -33,7 +33,7 @@ const SportsbookTable: React.FC<Props> = ({
 }) => {
   return (
     <div className="flex flex-row bg-slate-100 items-center border shadow-slate-300 shadow-md border-slate-300 justify-center w-[90%] mx-25 my-2.5 px-5 rounded-lg gap-5">
-      <div className="h-25  w-[20%] flex flex-col mx-auto my-5 justify-center items-center">
+      <div className="h-25 w-[20%] flex flex-col mx-auto my-5 justify-center items-center">
         {sportsBook.logo ? (
           <Image
             className="w-36 h-36 mt-2"
@@ -78,31 +78,28 @@ const SportsbookTable: React.FC<Props> = ({
                 const value = odd.values[teamIndex];
                 const rawTotal = value?.total || "";
 
-                let displayOdds = "-";
-                const parsed = parseFloat(rawTotal);
-                if (!isNaN(parsed) && parsed > 1.0) {
+                let moneyline = "";
+                const decimal = parseFloat(rawTotal);
+                if (!isNaN(decimal) && decimal > 1.0) {
                   try {
-                    displayOdds = decimalToAmericanOdds(parsed).toString();
+                    const american = decimalToAmericanOdds(decimal);
+                    moneyline = american > 0 ? `+${american}` : `${american}`;
                   } catch {
-                    displayOdds = "-";
+                    moneyline = "";
                   }
                 }
 
-                if (odd.type === "moneyline" && !isNaN(parsed)) {
-                  const americanOdds = decimalToAmericanOdds(parsed);
-                  const impliedProb = moneylineToProbability(
-                    americanOdds.toString()
-                  );
-                  displayOdds =
-                    impliedProb !== null ? impliedProb.toFixed(0) + "%" : "-";
-                }
+                // Calculate probability
+                const probability =
+                  !isNaN(decimal) && decimal > 1
+                    ? ((1 / decimal) * 100).toFixed(1)
+                    : "-";
 
                 return (
                   <td
                     key={odd.name + teamIndex}
                     className="text-center py-1 px-2.5 w-[20%]"
                   >
-                    {" "}
                     <div className="flex flex-row items-center justify-center">
                       {odd.type === "overunder" && (
                         <span
@@ -124,20 +121,33 @@ const SportsbookTable: React.FC<Props> = ({
                         </span>
                       )}
                       <Input
-                        type="number"
+                        type="text"
                         className="w-full text-center"
-                        value={rawTotal}
-                        onChange={(e) =>
-                          onOddsChange(
-                            betTypeIndex,
-                            teamIndex,
-                            e.target.value,
-                            value?.label
-                          )
-                        }
+                        value={moneyline}
+                        onChange={(e) => {
+                          const americanInput = e.target.value;
+                          let decimalOdds = 0;
+
+                          try {
+                            decimalOdds = americanToDecimalOdds(
+                              parseFloat(americanInput)
+                            );
+                          } catch {
+                            decimalOdds = 0;
+                          }
+
+                          if (!isNaN(decimalOdds) && decimalOdds > 1.0) {
+                            onOddsChange(
+                              betTypeIndex,
+                              teamIndex,
+                              decimalOdds.toString(),
+                              value?.label
+                            );
+                          }
+                        }}
                       />
                       <div className="text-[.65rem] px-2 ml-2 font-bold bg-slate-300 justify-center items-center mr-1 w-12 rounded-sm p-0.5 border-l-2 ml-0.5 flex text-slate-600">
-                        {displayOdds}
+                        {probability}%
                       </div>
                     </div>
                   </td>
@@ -151,7 +161,7 @@ const SportsbookTable: React.FC<Props> = ({
             <td className="font-semibold text-xs justify-center items-center text-center text-slate-600">
               Probabilities
             </td>
-            {sportsBook.odds.map((odd, betTypeIndex) => {
+            {sportsBook.odds.map((odd) => {
               return (
                 <td
                   key={`prob-${odd.name}`}

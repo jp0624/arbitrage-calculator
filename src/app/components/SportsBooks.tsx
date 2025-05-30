@@ -1,5 +1,5 @@
 "use client";
-import React, { useRef, useState } from "react";
+import React, { useState } from "react";
 import {
   Select,
   SelectContent,
@@ -10,9 +10,10 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "./ui/button";
 import HockeyTeams from "@/data/teams/hockey.json";
-import SportsBooks from "@/data/teams/sportsBooks.json";
+import SportsBooks from "@/data/sportsBooks.json";
 import SelectionBar from "./SelectionsBar";
 import SportsBookTable from "./SportsBookTable";
+import ArbitrageResults from "./ArbitrageResults"; // ✅ Import
 
 type oddValue = {
   total: string;
@@ -60,19 +61,24 @@ function Calculator() {
   const [selectedTeams, setSelectedTeams] = useState<string[]>(defaultTeams);
   const [defaultBetAmount, setDefaultBetAmount] = useState(100);
   const [sportsBooks, setSportsBooks] = useState<SportsBook[]>(
-    SportsBooks.map((book) => ({
+    SportsBooks.map((book: any) => ({
       ...book,
-      odds: book.odds.map((odds) => ({
+      odds: book.odds.map((odds: any) => ({
         ...odds,
-        values: odds.values.map((v: any) => ({
-          ...v,
-          label:
-            v.label === "Over"
-              ? "Over"
-              : v.label === "Under"
-              ? "Under"
-              : undefined,
-        })),
+        values: (odds.values as any[]).map((v: any) => {
+          if (typeof v === "string") {
+            return { total: v };
+          }
+          return {
+            total: v.total ?? (typeof v.value === "string" ? v.value : ""),
+            label:
+              v.label === "Over"
+                ? "Over"
+                : v.label === "Under"
+                ? "Under"
+                : undefined,
+          };
+        }),
       })),
     }))
   );
@@ -148,12 +154,7 @@ function Calculator() {
         oddsType = "puckline";
       } else {
         name = type.charAt(0).toUpperCase() + type.slice(1);
-        oddsType = type as
-          | "moneyline"
-          | "overunder"
-          | "spread"
-          | "total"
-          | "puckline";
+        oddsType = type as typeof oddsType;
       }
 
       return {
@@ -199,6 +200,19 @@ function Calculator() {
     });
   };
 
+  // ✅ Transform data for ArbitrageResults
+  const transformedBooks = sportsBooks.map((book) => ({
+    name: book.name,
+    odds: book.odds.map((o) => ({
+      name: o.name,
+      values: o.values.map((v) => v.total),
+    })),
+  }));
+
+  const betTypes = Array.from(
+    new Set(sportsBooks.flatMap((book) => book.odds.map((odds) => odds.name)))
+  ).map((name) => ({ name }));
+
   return (
     <>
       <SelectionBar
@@ -211,7 +225,17 @@ function Calculator() {
         handleSportChange={handleSportChange}
         handleTeamChange={handleTeamChange}
       />
-      Total Spent per Betting Type: {defaultBetAmount}
+
+      <p>Total Spent per Betting Type: {defaultBetAmount}</p>
+
+      {/* ✅ Arbitrage Results before SportsBookTable list */}
+      <ArbitrageResults
+        sportsBooks={transformedBooks}
+        selectedTeams={selectedTeams}
+        betTypes={betTypes}
+        defaultBetAmount={defaultBetAmount}
+      />
+
       {(sportsBooks ?? []).map((sportsBook, sIndex) => (
         <SportsBookTable
           key={sportsBook.name}
@@ -228,6 +252,7 @@ function Calculator() {
           }
         />
       ))}
+
       <div className="flex flex-row items-center justify-center gap-2 mt-4">
         <Button
           onClick={() => setShowModal(true)}
@@ -236,6 +261,7 @@ function Calculator() {
           Add Sportsbook
         </Button>
       </div>
+
       {showModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
           <div className="bg-white p-6 rounded-lg shadow-md w-[90%] max-w-md space-y-4">

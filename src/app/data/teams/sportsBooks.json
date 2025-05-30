@@ -1,7 +1,7 @@
 [
   {
-    "name": "DraftKings",
-    "logo": "/logos/logo-DraftKings.png",
+    "name": "Sports Interaction",
+    "logo": "/logos/logo-si.svg",
     "odds": [
       {
         "name": "Puck Line",
@@ -19,6 +19,54 @@
       {
         "name": "Moneyline",
         "values": [{ "total": "1.85" }, { "total": "1.98" }],
+        "type": "moneyline"
+      }
+    ]
+  },
+  {
+    "name": "DraftKings",
+    "logo": "/logos/logo-draftkings.svg",
+    "odds": [
+      {
+        "name": "Puck Line",
+        "values": [{ "total": "1.5" }, { "total": "1.5" }],
+        "type": "spread"
+      },
+      {
+        "name": "Total",
+        "values": [
+          { "label": "Over", "total": "2.25" },
+          { "label": "Under", "total": "2.25" }
+        ],
+        "type": "overunder"
+      },
+      {
+        "name": "Moneyline",
+        "values": [{ "total": "1.65" }, { "total": "1.5" }],
+        "type": "moneyline"
+      }
+    ]
+  },
+  {
+    "name": "Pinnacle",
+    "logo": "/logos/logo-pinnacle.svg",
+    "odds": [
+      {
+        "name": "Puck Line",
+        "values": [{ "total": "1.35" }, { "total": "2.25" }],
+        "type": "spread"
+      },
+      {
+        "name": "Total",
+        "values": [
+          { "label": "Over", "total": "5.5" },
+          { "label": "Under", "total": "5.5" }
+        ],
+        "type": "overunder"
+      },
+      {
+        "name": "Moneyline",
+        "values": [{ "total": "1.88" }, { "total": "1.5" }],
         "type": "moneyline"
       }
     ]

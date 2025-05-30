@@ -10,6 +10,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "../ui/button";
 import HockeyTeams from "@/data/teams/hockey.json";
+import SportsBooks from "@/data/teams/sportsBooks.json";
 import SelectionBar from "./SelectionsBar";
 import SportsBookTable from "./SportsBookTable";
 
@@ -20,7 +21,7 @@ type oddValue = {
 
 type Odds = {
   name: string;
-  type: "moneyline" | "spread" | "overunder" | "total" | "puckline";
+  type: string;
   values: oddValue[];
 };
 
@@ -58,104 +59,7 @@ function Calculator() {
   const [sport, setSport] = useState<(typeof sports)[0] | undefined>(sports[0]);
   const [selectedTeams, setSelectedTeams] = useState<string[]>(defaultTeams);
   const [defaultBetAmount, setDefaultBetAmount] = useState(100);
-  const [sportsBooks, setSportsBooks] = useState<SportsBook[]>([
-    {
-      name: "Sports Interaction",
-      logo: "/logos/logo-si.svg",
-      odds: [
-        {
-          name: "Puck Line",
-          values: [{ total: "1.43" }, { total: "2.75" }],
-          type: "spread",
-        },
-        {
-          name: "Total",
-          values: [
-            { label: "Over", total: "1.87" },
-            { label: "Under", total: "1.95" },
-          ],
-          type: "overunder",
-        },
-        {
-          name: "Moneyline",
-          values: [{ total: "1.85" }, { total: "1.98" }],
-          type: "moneyline",
-        },
-      ],
-    },
-    {
-      name: "DraftKings",
-      logo: "/logos/logo-draftkings.svg",
-      odds: [
-        {
-          name: "Puck Line",
-          values: [{ total: "1.5" }, { total: "1.5" }],
-          type: "spread",
-        },
-        {
-          name: "Total",
-          values: [
-            { label: "Over", total: "2.25" },
-            { label: "Under", total: "2.25" },
-          ],
-          type: "overunder",
-        },
-        {
-          name: "Moneyline",
-          values: [{ total: "1.65" }, { total: "1.5" }],
-          type: "moneyline",
-        },
-      ],
-    },
-    {
-      name: "Pinnacle",
-      logo: "/logos/logo-pinnacle.svg",
-      odds: [
-        {
-          name: "Puck Line",
-          values: [{ total: "1.35" }, { total: "2.25" }],
-          type: "spread",
-        },
-        {
-          name: "Total",
-          values: [
-            { label: "Over", total: "5.5" },
-            { label: "Under", total: "5.5" },
-          ],
-          type: "overunder",
-        },
-        {
-          name: "Moneyline",
-          values: [{ total: "1.88" }, { total: "1.5" }],
-          type: "moneyline",
-        },
-      ],
-    },
-    {
-      name: "FanDuel",
-      logo: "/logos/logo-fandual.svg",
-      odds: [
-        {
-          name: "Puck Line",
-          values: [{ total: "1.48" }, { total: "2.55" }],
-          type: "spread",
-        },
-        {
-          name: "Total",
-          values: [
-            { label: "Over", total: "1.91" },
-            { label: "Under", total: "1.91" },
-          ],
-          type: "overunder",
-        },
-        {
-          name: "Moneyline",
-          values: [{ total: "1.88" }, { total: "1.94" }],
-          type: "moneyline",
-        },
-      ],
-    },
-  ]);
+  const [sportsBooks, setSportsBooks] = useState<SportsBook[]>(SportsBooks);
 
   const [showModal, setShowModal] = useState(false);
   const [newBookName, setNewBookName] = useState("");
@@ -252,7 +156,7 @@ function Calculator() {
       odds: newOdds,
     };
 
-    setSportsBooks((prev) => [...prev, newBook]);
+    setSportsBooks((prev) => [...(prev ?? []), newBook]);
     setShowModal(false);
     setNewBookName("");
     setNewBookLogo("");
@@ -268,7 +172,7 @@ function Calculator() {
     label?: "Over" | "Under"
   ) => {
     setSportsBooks((prev) => {
-      const newBooks = [...prev];
+      const newBooks = [...(prev ?? [])];
       const betType = newBooks[sportsBookIndex].odds[betTypeIndex];
       betType.values[teamIndex] = {
         ...betType.values[teamIndex],
@@ -292,7 +196,7 @@ function Calculator() {
         handleTeamChange={handleTeamChange}
       />
       Total Spent per Betting Type: {defaultBetAmount}
-      {sportsBooks.map((sportsBook, sIndex) => (
+      {(sportsBooks ?? []).map((sportsBook, sIndex) => (
         <SportsBookTable
           key={sportsBook.name}
           sportsBook={sportsBook}

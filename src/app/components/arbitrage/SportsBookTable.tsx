@@ -14,7 +14,7 @@ type Props = {
     odds: {
       name: string;
       values: { label?: "Over" | "Under"; total: string }[];
-      type: "moneyline" | "overunder" | "spread" | "total" | "puckline";
+      type: string;
     }[];
   };
   onOddsChange: (

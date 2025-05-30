@@ -77,23 +77,30 @@ const SportsbookTable: React.FC<Props> = ({
               {sportsBook.odds.map((odd, betTypeIndex) => {
                 const value = odd.values[teamIndex];
                 const rawTotal = value?.total || "";
-
-                let moneyline = "";
                 const decimal = parseFloat(rawTotal);
-                if (!isNaN(decimal) && decimal > 1.0) {
-                  try {
-                    const american = decimalToAmericanOdds(decimal);
-                    moneyline = american > 0 ? `+${american}` : `${american}`;
-                  } catch {
-                    moneyline = "";
+                const oddType = odd.name.toLowerCase();
+
+                let inputDisplayValue = rawTotal;
+                let displaySpan = "-";
+
+                if (!isNaN(decimal) && decimal > 1) {
+                  if (oddType === "moneyline") {
+                    try {
+                      const american = decimalToAmericanOdds(decimal);
+                      inputDisplayValue =
+                        american > 0 ? `+${american}` : `${american}`;
+                      displaySpan = `${((1 / decimal) * 100).toFixed(1)}%`;
+                    } catch {}
+                  } else {
+                    // Puck Line / Total: input as decimal, span as American
+                    inputDisplayValue = decimal.toString();
+                    try {
+                      const american = decimalToAmericanOdds(decimal);
+                      displaySpan =
+                        american > 0 ? `+${american}` : `${american}`;
+                    } catch {}
                   }
                 }
-
-                // Calculate probability
-                const probability =
-                  !isNaN(decimal) && decimal > 1
-                    ? ((1 / decimal) * 100).toFixed(1)
-                    : "-";
 
                 return (
                   <td
@@ -123,15 +130,21 @@ const SportsbookTable: React.FC<Props> = ({
                       <Input
                         type="text"
                         className="w-full text-center"
-                        value={moneyline}
+                        value={inputDisplayValue}
                         onChange={(e) => {
-                          const americanInput = e.target.value;
+                          const inputVal = e.target.value;
                           let decimalOdds = 0;
 
-                          try {
-                            decimalOdds = americanToDecimalOdds(americanInput);
-                          } catch {
-                            decimalOdds = 0;
+                          if (oddType === "moneyline") {
+                            try {
+                              decimalOdds = americanToDecimalOdds(
+                                parseFloat(inputVal)
+                              );
+                            } catch {
+                              decimalOdds = 0;
+                            }
+                          } else {
+                            decimalOdds = parseFloat(inputVal);
                           }
 
                           if (!isNaN(decimalOdds) && decimalOdds > 1.0) {
@@ -145,7 +158,7 @@ const SportsbookTable: React.FC<Props> = ({
                         }}
                       />
                       <div className="text-[.65rem] px-2 ml-2 font-bold bg-slate-300 justify-center items-center mr-1 w-12 rounded-sm p-0.5 border-l-2 ml-0.5 flex text-slate-600">
-                        {probability}%
+                        {displaySpan}
                       </div>
                     </div>
                   </td>

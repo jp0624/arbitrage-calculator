@@ -1,0 +1,50 @@
+[
+  {
+    "name": "DraftKings",
+    "logo": "/logos/logo-DraftKings.png",
+    "odds": [
+      {
+        "name": "Puck Line",
+        "values": [{ "total": "1.43" }, { "total": "2.75" }],
+        "type": "spread"
+      },
+      {
+        "name": "Total",
+        "values": [
+          { "label": "Over", "total": "1.87" },
+          { "label": "Under", "total": "1.95" }
+        ],
+        "type": "overunder"
+      },
+      {
+        "name": "Moneyline",
+        "values": [{ "total": "1.85" }, { "total": "1.98" }],
+        "type": "moneyline"
+      }
+    ]
+  },
+  {
+    "name": "FanDuel",
+    "logo": "/logos/logo-fandual.svg",
+    "odds": [
+      {
+        "name": "Puck Line",
+        "values": [{ "total": "1.48" }, { "total": "2.55" }],
+        "type": "spread"
+      },
+      {
+        "name": "Total",
+        "values": [
+          { "label": "Over", "total": "1.91" },
+          { "label": "Under", "total": "1.91" }
+        ],
+        "type": "overunder"
+      },
+      {
+        "name": "Moneyline",
+        "values": [{ "total": "1.88" }, { "total": "1.94" }],
+        "type": "moneyline"
+      }
+    ]
+  }
+]

@@ -1,5 +1,5 @@
 "use client";
-import React, { useRef } from "react";
+import React, { useRef, useState } from "react";
 import {
   Select,
   SelectContent,
@@ -12,25 +12,21 @@ import { Button } from "../ui/button";
 import HockeyTeams from "@/data/teams/hockey.json";
 import SelectionBar from "./SelectionsBar";
 import SportsBookTable from "./SportsBookTable";
-import ArbitrageResults from "./ArbitrageResults";
 
-// Define odds types with discriminated union
-type MoneylineOrSpreadOdds = {
-  name: string;
-  type: "moneyline" | "spread";
-  values: string[];
+type oddValue = {
+  total: string;
+  label?: "Over" | "Under";
 };
 
-type OverUnderOdds = {
+type Odds = {
   name: string;
-  type: "overunder";
-  values: { label: "O" | "U"; total: string; odds: string }[];
+  type: "moneyline" | "spread" | "overunder" | "total" | "puckline";
+  values: oddValue[];
 };
-
-type Odds = MoneylineOrSpreadOdds | OverUnderOdds;
 
 type SportsBook = {
   name: string;
+  logo?: string;
   odds: Odds[];
 };
 
@@ -59,45 +55,78 @@ function Calculator() {
     ?.teams.slice(0, 2)
     .map((t) => t.name) || ["Team A", "Team B"];
 
-  const [sport, setSport] = React.useState<(typeof sports)[0] | undefined>(
-    sports[0]
-  );
-  const [selectedTeams, setSelectedTeams] =
-    React.useState<string[]>(defaultTeams);
-  const [defaultBetAmount, setDefaultBetAmount] = React.useState(100);
-
-  const [sportsBooks, setSportsBooks] = React.useState<SportsBook[]>([
+  const [sport, setSport] = useState<(typeof sports)[0] | undefined>(sports[0]);
+  const [selectedTeams, setSelectedTeams] = useState<string[]>(defaultTeams);
+  const [defaultBetAmount, setDefaultBetAmount] = useState(100);
+  const [sportsBooks, setSportsBooks] = useState<SportsBook[]>([
     {
       name: "DraftKings",
+      logo: "/logos/logo-DraftKings.png",
       odds: [
-        { name: "Puck Line", values: ["-1.5", "1.5"], type: "spread" },
+        {
+          name: "Puck Line",
+          values: [{ total: "1.43" }, { total: "2.75" }],
+          type: "spread",
+        },
         {
           name: "Total",
           values: [
-            { label: "O", total: "5.5", odds: "-110" },
-            { label: "U", total: "5.5", odds: "-110" },
+            { label: "Over", total: "1.87" },
+            { label: "Under", total: "1.95" },
           ],
           type: "overunder",
         },
-        { name: "Moneyline", values: ["-118", "-102"], type: "moneyline" },
+        {
+          name: "Moneyline",
+          values: [{ total: "1.85" }, { total: "1.98" }],
+          type: "moneyline",
+        },
       ],
     },
     {
       name: "FanDuel",
+      logo: "/logos/logo-fandual.svg",
       odds: [
-        { name: "Puck Line", values: ["-1.5", "1.5"], type: "spread" },
+        {
+          name: "Puck Line",
+          values: [{ total: "1.48" }, { total: "2.55" }],
+          type: "spread",
+        },
         {
           name: "Total",
           values: [
-            { label: "O", total: "5.5", odds: "-110" },
-            { label: "U", total: "5.5", odds: "-110" },
+            { label: "Over", total: "1.91" },
+            { label: "Under", total: "1.91" },
           ],
           type: "overunder",
         },
-        { name: "Moneyline", values: ["-113", "-106"], type: "moneyline" },
+        {
+          name: "Moneyline",
+          values: [{ total: "1.88" }, { total: "1.94" }],
+          type: "moneyline",
+        },
       ],
     },
   ]);
+
+  const [showModal, setShowModal] = useState(false);
+  const [newBookName, setNewBookName] = useState("");
+  const [newBookLogo, setNewBookLogo] = useState("");
+  const [selectedTypes, setSelectedTypes] = useState<string[]>([
+    "spread",
+    "total",
+    "moneyline",
+  ]);
+  const [formError, setFormError] = useState("");
+
+  function isValidUrl(string: string): boolean {
+    try {
+      new URL(string);
+      return true;
+    } catch {
+      return false;
+    }
+  }
 
   function handleSportChange(value: string) {
     const selectedSport = sports.find((s) => s.name === value);
@@ -117,56 +146,87 @@ function Calculator() {
     });
   }
 
-  const newSportsbookRef = useRef<HTMLInputElement>(null);
-
-  const addSportsBook = () => {
-    const name = newSportsbookRef.current?.value || "New Sportsbook";
-    setSportsBooks((prevSportsBooks) => [
-      ...prevSportsBooks,
-      {
-        name,
-        odds: [
-          { name: "Puck Line", values: ["0", "0"], type: "spread" },
-          {
-            name: "Total",
-            values: [
-              { label: "O", total: "0", odds: "0" },
-              { label: "U", total: "0", odds: "0" },
-            ],
-            type: "overunder",
-          },
-          { name: "Moneyline", values: ["0", "0"], type: "moneyline" },
-        ],
-      },
-    ]);
-  };
-
   function handleBetAmountChange(value: number) {
     setDefaultBetAmount(value);
   }
 
-  // Updated to handle the discriminated union
+  const handleAddSportsBook = () => {
+    setFormError("");
+
+    if (!newBookName.trim()) {
+      setFormError("Sportsbook name is required.");
+      return;
+    }
+
+    if (newBookLogo.trim() && !isValidUrl(newBookLogo.trim())) {
+      setFormError("Please enter a valid URL for the logo.");
+      return;
+    }
+
+    const newOdds = selectedTypes.map((type) => {
+      let name = "";
+      let oddsType: "moneyline" | "overunder" | "spread" | "total" | "puckline";
+      if (type === "spread") {
+        name = "Puck Line";
+        oddsType = "spread";
+      } else if (type === "total") {
+        name = "Total";
+        oddsType = "overunder";
+      } else if (type === "moneyline") {
+        name = "Moneyline";
+        oddsType = "moneyline";
+      } else if (type === "puckline") {
+        name = "Puck Line";
+        oddsType = "puckline";
+      } else {
+        name = type.charAt(0).toUpperCase() + type.slice(1);
+        oddsType = type as
+          | "moneyline"
+          | "overunder"
+          | "spread"
+          | "total"
+          | "puckline";
+      }
+
+      return {
+        name,
+        type: oddsType,
+        values: selectedTeams.map(() => ({
+          label: type === "total" ? ("Over" as "Over") : undefined,
+          total: "",
+        })),
+      };
+    });
+
+    const newBook: SportsBook = {
+      name: newBookName.trim(),
+      logo: newBookLogo.trim() || undefined,
+      odds: newOdds,
+    };
+
+    setSportsBooks((prev) => [...prev, newBook]);
+    setShowModal(false);
+    setNewBookName("");
+    setNewBookLogo("");
+    setSelectedTypes(["spread", "total", "moneyline"]);
+    setFormError("");
+  };
+
   const handleSportsBookChange = (
     sportsBookIndex: number,
     betTypeIndex: number,
     teamIndex: number,
-    newValue: string
+    newValue: string,
+    label?: "Over" | "Under"
   ) => {
     setSportsBooks((prev) => {
       const newBooks = [...prev];
       const betType = newBooks[sportsBookIndex].odds[betTypeIndex];
-
-      if (betType.type === "overunder") {
-        const value = betType.values[teamIndex] as {
-          label: "O" | "U";
-          total: string;
-          odds: string;
-        };
-        value.total = newValue; // only update total
-      } else {
-        betType.values[teamIndex] = newValue; // string value
-      }
-
+      betType.values[teamIndex] = {
+        ...betType.values[teamIndex],
+        total: newValue,
+        ...(label ? { label } : {}),
+      };
       return newBooks;
     });
   };
@@ -184,27 +244,93 @@ function Calculator() {
         handleTeamChange={handleTeamChange}
       />
       Total Spent per Betting Type: {defaultBetAmount}
-      <ArbitrageResults sportsBooks={sportsBooks} />
       {sportsBooks.map((sportsBook, sIndex) => (
         <SportsBookTable
           key={sportsBook.name}
           sportsBook={sportsBook}
           selectedTeams={selectedTeams}
-          onOddsChange={(betTypeIndex, teamIndex, value) =>
-            handleSportsBookChange(sIndex, betTypeIndex, teamIndex, value)
+          onOddsChange={(betTypeIndex, teamIndex, value, label) =>
+            handleSportsBookChange(
+              sIndex,
+              betTypeIndex,
+              teamIndex,
+              value,
+              label
+            )
           }
         />
       ))}
-      <div className="flex flex-row items-center justify-center">
-        <Input
-          type="text"
-          placeholder="New Sportsbook"
-          ref={newSportsbookRef}
-        />
-        <Button className="m-5" onClick={addSportsBook}>
-          Add Sports Book
+      <div className="flex flex-row items-center justify-center gap-2 mt-4">
+        <Button
+          onClick={() => setShowModal(true)}
+          className=" text-white px-4 py-2 rounded shadow hover:cursor-pointer"
+        >
+          Add Sportsbook
         </Button>
       </div>
+      {showModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-white p-6 rounded-lg shadow-md w-[90%] max-w-md space-y-4">
+            <h2 className="text-xl font-semibold">Add New Sportsbook</h2>
+
+            {formError && (
+              <p className="text-red-600 text-sm font-medium">{formError}</p>
+            )}
+
+            <input
+              type="text"
+              placeholder="Sportsbook Name"
+              value={newBookName}
+              onChange={(e) => setNewBookName(e.target.value)}
+              className="w-full p-2 border rounded"
+            />
+
+            <input
+              type="text"
+              placeholder="Logo URL (optional)"
+              value={newBookLogo}
+              onChange={(e) => setNewBookLogo(e.target.value)}
+              className="w-full p-2 border rounded"
+            />
+
+            <div className="space-y-2">
+              <label className="block font-medium">Supported Bet Types:</label>
+              {["spread", "total", "moneyline"].map((type) => (
+                <label key={type} className="block">
+                  <input
+                    type="checkbox"
+                    checked={selectedTypes.includes(type)}
+                    onChange={() =>
+                      setSelectedTypes((prev) =>
+                        prev.includes(type)
+                          ? prev.filter((t) => t !== type)
+                          : [...prev, type]
+                      )
+                    }
+                    className="mr-2"
+                  />
+                  {type.charAt(0).toUpperCase() + type.slice(1)}
+                </label>
+              ))}
+            </div>
+
+            <div className="flex justify-end space-x-2">
+              <button
+                onClick={() => setShowModal(false)}
+                className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleAddSportsBook}
+                className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+              >
+                Add
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 }

@@ -8,7 +8,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
-import { Button } from "../ui/button";
+import { Button } from "./ui/button";
 import HockeyTeams from "@/data/teams/hockey.json";
 import SportsBooks from "@/data/teams/sportsBooks.json";
 import SelectionBar from "./SelectionsBar";
@@ -60,14 +60,18 @@ function Calculator() {
   const [selectedTeams, setSelectedTeams] = useState<string[]>(defaultTeams);
   const [defaultBetAmount, setDefaultBetAmount] = useState(100);
   const [sportsBooks, setSportsBooks] = useState<SportsBook[]>(
-    (SportsBooks as any[]).map((book) => ({
+    SportsBooks.map((book) => ({
       ...book,
-      odds: book.odds.map((odds: any) => ({
+      odds: book.odds.map((odds) => ({
         ...odds,
         values: odds.values.map((v: any) => ({
           ...v,
           label:
-            v.label === "Over" || v.label === "Under" ? v.label : undefined,
+            v.label === "Over"
+              ? "Over"
+              : v.label === "Under"
+              ? "Under"
+              : undefined,
         })),
       })),
     }))

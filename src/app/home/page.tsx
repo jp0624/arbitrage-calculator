@@ -1,4 +1,4 @@
-import Calculator from "@/components/arbitrage/Calculator";
+import Calculator from "@/app/components/SportsBooks";
 import React from "react";
 
 function home() {

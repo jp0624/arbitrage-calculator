@@ -4,6 +4,7 @@ import { Input } from "@/components//ui/input";
 import {
   moneylineToProbability,
   decimalToAmericanOdds,
+  decimalToMoneyline,
 } from "@/lib/oddsConverter";
 
 type Props = {

@@ -2,6 +2,7 @@
 
 # dependencies
 /node_modules
+/_BAK
 /.pnp
 .pnp.*
 .yarn/*

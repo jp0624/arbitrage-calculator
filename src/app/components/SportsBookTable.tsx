@@ -128,7 +128,7 @@ const SportsbookTable: React.FC<Props> = ({
                         </span>
                       )}
                       <Input
-                        type="text"
+                        type="number"
                         className="w-full text-center"
                         value={inputDisplayValue}
                         onChange={(e) => {
@@ -137,9 +137,7 @@ const SportsbookTable: React.FC<Props> = ({
 
                           if (oddType === "moneyline") {
                             try {
-                              decimalOdds = americanToDecimalOdds(
-                                parseFloat(inputVal)
-                              );
+                              decimalOdds = americanToDecimalOdds(inputVal);
                             } catch {
                               decimalOdds = 0;
                             }

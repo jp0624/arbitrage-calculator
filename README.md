@@ -1,4 +1,4 @@
-# 👮‍♂️ Arbitrage Betting Calculator
+# 👮‍♂️ SportsBooks
 
 This is a React/Next.js-based web application that allows users to input and compare sportsbook odds across multiple teams and bet types (Moneyline, Puck Line, Over/Under Totals) to identify **arbitrage opportunities** in real time.
 
